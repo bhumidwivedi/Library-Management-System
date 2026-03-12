@@ -524,10 +524,9 @@
 </main>
 
 <script>
-  // ------------------ SIMPLE IN-MEMORY DATA -------------------
   let currentRole = null;
-  let lastIssuedRecord = null;     // for Return Book
-  let lastReturnRecord = null;     // for Fine Pay
+  let lastIssuedRecord = null;     // for Return
+  let lastReturnRecord = null;     // for Fine Payment
 
   const books = [
     { title: "The Great Gatsby", author: "F. Scott Fitzgerald", category: "Fiction", serial: "B001" },
@@ -543,8 +542,6 @@
     { name: "Admin", loginId: "admin", role: "admin" },
     { name: "User One", loginId: "user1", role: "user" }
   ];
-
-  // ------------------ UTILS -------------------
   function showSection(sectionId) {
     document.querySelectorAll(".section").forEach(sec => sec.classList.remove("active"));
     const target = document.getElementById(sectionId);
@@ -588,7 +585,7 @@
 
     // Role-based navigation
     // Admin: can access everything
-    // User: cannot access maintenance (Add/Update Book, Membership, User Mgmt)
+    // User: cannot access maintenance (Add/Update Book, Membership, User Management)
     const isAdmin = role === "admin";
 
     const maintenanceButtons = [
@@ -1054,4 +1051,5 @@
   });
 </script>
 </body>
+
 </html>
