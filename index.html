@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Library Management System</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f4f6f9;
+      color: #333;
+    }
+    header {
+      background: #2c3e50;
+      color: #fff;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+    header .user-info {
+      font-size: 14px;
+    }
+    nav {
+      background: #34495e;
+      color: #fff;
+      display: flex;
+      gap: 10px;
+      padding: 8px 20px;
+      flex-wrap: wrap;
+    }
+    nav button {
+      background: #2ecc71;
+      border: none;
+      padding: 6px 12px;
+      color: #fff;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    nav button.hidden {
+      display: none;
+    }
+    nav button.active {
+      background: #27ae60;
+      font-weight: bold;
+    }
+    main {
+      padding: 20px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 6px;
+      padding: 15px 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+      max-width: 800px;
+      margin-bottom: 20px;
+    }
+    .section {
+      display: none;
+    }
+    .section.active {
+      display: block;
+    }
+    h2 {
+      margin-top: 0;
+      font-size: 18px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 5px;
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin: 6px 0 2px;
+      font-size: 14px;
+    }
+    input[type="text"],
+    input[type="password"],
+    input[type="date"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 6px 8px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+    .row {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .col-half {
+      flex: 1 1 300px;
+    }
+    .form-actions {
+      margin-top: 12px;
+    }
+    .form-actions button {
+      background: #3498db;
+      border: none;
+      padding: 6px 12px;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .error {
+      color: #c0392b;
+      font-size: 13px;
+      margin-top: 6px;
+    }
+    .success {
+      color: #27ae60;
+      font-size: 13px;
+      margin-top: 6px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px;
+      font-size: 13px;
+      text-align: left;
+    }
+    th {
+      background: #ecf0f1;
+    }
+    .hidden {
+      display: none;
+    }
+    .radio-group, .checkbox-group {
+      margin-top: 4px;
+    }
+    .radio-group label,
+    .checkbox-group label {
+      display: inline-block;
+      margin-right: 10px;
+      font-weight: normal;
+    }
+    .badge {
+      background: #e67e22;
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 11px;
+      margin-left: 4px;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Library Management System</h1>
+  <div class="user-info" id="userInfo">Not logged in</div>
+</header>
+
+<nav id="navBar" class="hidden">
+  <!-- Maintenance -->
+  <button id="navAddBook" data-section="addBookSection">Add Book</button>
+  <button id="navUpdateBook" data-section="updateBookSection">Update Book</button>
+  <button id="navAddMember" data-section="addMembershipSection">Add Membership</button>
+  <button id="navUpdateMember" data-section="updateMembershipSection">Update Membership</button>
+  <button id="navUserMgmt" data-section="userManagementSection">User Management</button>
+
+  <!-- Reports / Transactions -->
+  <button id="navBookAvailable" data-section="bookAvailableSection">Book Available</button>
+  <button id="navBookIssue" data-section="bookIssueSection">Book Issue</button>
+  <button id="navReturnBook" data-section="returnBookSection">Return Book</button>
+  <button id="navFinePay" data-section="finePaySection">Fine Pay</button>
+
+  <button id="navLogout">Logout</button>
+</nav>
+
+<main>
+  <!-- LOGIN SECTION -->
+  <section id="loginSection" class="section active">
+    <div class="card">
+      <h2>Login</h2>
+      <div id="loginMessage" class="error"></div>
+      <label for="loginUsername">Username</label>
+      <input type="text" id="loginUsername" />
+
+      <label for="loginPassword">Password</label>
+      <input type="password" id="loginPassword" />
+
+      <div class="radio-group">
+        <span>Role:</span>
+        <label><input type="radio" name="role" value="admin" checked /> Admin</label>
+        <label><input type="radio" name="role" value="user" /> User</label>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" onclick="handleLogin()">Login</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- DASHBOARD / HOME (optional small card) -->
+  <section id="homeSection" class="section">
+    <div class="card">
+      <h2>Welcome</h2>
+      <p>
+        Use the navigation buttons above to access 
+        <strong>Maintenance</strong>, <strong>Reports</strong> and <strong>Transactions</strong>
+        (based on your role).
+      </p>
+    </div>
+  </section>
+
+  <!-- BOOK AVAILABLE (REPORT) -->
+  <section id="bookAvailableSection" class="section">
+    <div class="card">
+      <h2>Book Available</h2>
+      <div id="bookAvailableMsg" class="error"></div>
+
+      <label for="searchText">Search by Title/Author (Text Box)</label>
+      <input type="text" id="searchText" placeholder="Enter title or author" />
+
+      <label for="categorySelect">Filter by Category (Drop-down)</label>
+      <select id="categorySelect">
+        <option value="">-- Select Category --</option>
+        <option value="Fiction">Fiction</option>
+        <option value="Science">Science</option>
+        <option value="Movie">Movie</option>
+      </select>
+
+      <div class="form-actions">
+        <button type="button" onclick="handleBookAvailableSearch()">Search</button>
+      </div>
+
+      <table id="searchResultsTable" class="hidden">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Category</th>
+            <th>Serial No</th>
+            <th>Select</th>
+          </tr>
+        </thead>
+        <tbody id="searchResultsBody">
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- BOOK ISSUE (TRANSACTION) -->
+  <section id="bookIssueSection" class="section">
+    <div class="card">
+      <h2>Book Issue</h2>
+      <div id="bookIssueMsg" class="error"></div>
+      <div id="bookIssueSuccess" class="success"></div>
+
+      <label for="issueBookName">Name of Book (required)</label>
+      <input type="text" id="issueBookName" />
+
+      <label for="issueAuthorName">Author Name (auto populated, non editable)</label>
+      <input type="text" id="issueAuthorName" readonly />
+
+      <label for="issueDate">Issue Date (cannot be less than today)</label>
+      <input type="date" id="issueDate" />
+
+      <label for="returnDateIssue">Return Date 
+        <span class="badge">Auto 15 days ahead, max +15 days</span>
+      </label>
+      <input type="date" id="returnDateIssue" />
+
+      <label for="issueRemarks">Remarks (optional)</label>
+      <textarea id="issueRemarks"></textarea>
+
+      <div class="form-actions">
+        <button type="button" onclick="handleBookIssue()">Confirm Issue</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- RETURN BOOK (TRANSACTION) -->
+  <section id="returnBookSection" class="section">
+    <div class="card">
+      <h2>Return Book</h2>
+      <div id="returnBookMsg" class="error"></div>
+      <div id="returnBookSuccess" class="success"></div>
+
+      <label for="returnBookName">Name of Book (required)</label>
+      <input type="text" id="returnBookName" />
+
+      <label for="returnAuthorName">Author Name (auto, non editable)</label>
+      <input type="text" id="returnAuthorName" readonly />
+
+      <label for="returnSerialNo">Serial No (mandatory)</label>
+      <input type="text" id="returnSerialNo" />
+
+      <label for="returnIssueDate">Issue Date (auto, non editable)</label>
+      <input type="date" id="returnIssueDate" readonly />
+
+      <label for="returnDate">Return Date 
+        <span class="badge">Default = issued return date, editable earlier/later</span>
+      </label>
+      <input type="date" id="returnDate" />
+
+      <div class="form-actions">
+        <button type="button" onclick="handleReturnBook()">Confirm &amp; Go To Pay Fine</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINE PAY (TRANSACTION) -->
+  <section id="finePaySection" class="section">
+    <div class="card">
+      <h2>Fine Pay</h2>
+      <div id="finePayMsg" class="error"></div>
+      <div id="finePaySuccess" class="success"></div>
+
+      <!-- For simplicity, these are populated from last return transaction -->
+      <label for="fineBookName">Book Name</label>
+      <input type="text" id="fineBookName" readonly />
+
+      <label for="fineMemberName">Member Name</label>
+      <input type="text" id="fineMemberName" readonly />
+
+      <label for="fineAmount">Calculated Fine (Rs)</label>
+      <input type="number" id="fineAmount" readonly />
+
+      <div class="checkbox-group">
+        <label>
+          <input type="checkbox" id="finePaidCheckbox" />
+          Fine Paid (check = yes)
+        </label>
+      </div>
+
+      <label for="fineRemarks">Remarks</label>
+      <textarea id="fineRemarks"></textarea>
+
+      <div class="form-actions">
+        <button type="button" onclick="handleFinePay()">Confirm</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADD MEMBERSHIP (MAINTENANCE) -->
+  <section id="addMembershipSection" class="section">
+    <div class="card">
+      <h2>Add Membership</h2>
+      <div id="addMemberMsg" class="error"></div>
+      <div id="addMemberSuccess" class="success"></div>
+
+      <label for="addMemberName">Member Name (mandatory)</label>
+      <input type="text" id="addMemberName" />
+
+      <label for="addMemberEmail">Email (mandatory)</label>
+      <input type="text" id="addMemberEmail" />
+
+      <label for="addMemberPhone">Phone (mandatory)</label>
+      <input type="text" id="addMemberPhone" />
+
+      <div class="radio-group">
+        <span>Membership Duration (mandatory):</span>
+        <label><input type="radio" name="addMemberDuration" value="6" checked /> 6 months</label>
+        <label><input type="radio" name="addMemberDuration" value="12" /> 1 year</label>
+        <label><input type="radio" name="addMemberDuration" value="24" /> 2 years</label>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" onclick="handleAddMembership()">Add Membership</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- UPDATE MEMBERSHIP (MAINTENANCE) -->
+  <section id="updateMembershipSection" class="section">
+    <div class="card">
+      <h2>Update Membership</h2>
+      <div id="updateMemberMsg" class="error"></div>
+      <div id="updateMemberSuccess" class="success"></div>
+
+      <label for="updateMemberNumber">Membership Number (mandatory)</label>
+      <input type="text" id="updateMemberNumber" />
+
+      <div class="form-actions">
+        <button type="button" onclick="populateMembership()">Load Membership</button>
+      </div>
+
+      <div id="updateMemberForm" class="hidden">
+        <label for="updateMemberName">Member Name</label>
+        <input type="text" id="updateMemberName" />
+
+        <label for="updateMemberEmail">Email</label>
+        <input type="text" id="updateMemberEmail" />
+
+        <label for="updateMemberPhone">Phone</label>
+        <input type="text" id="updateMemberPhone" />
+
+        <div class="radio-group">
+          <span>Action:</span>
+          <label><input type="radio" name="memberAction" value="extend" checked /> Extend Membership</label>
+          <label><input type="radio" name="memberAction" value="cancel" /> Cancel Membership</label>
+        </div>
+
+        <div class="radio-group">
+          <span>Extension Duration:</span>
+          <label><input type="radio" name="extendDuration" value="6" checked /> 6 months</label>
+          <label><input type="radio" name="extendDuration" value="12" /> 1 year</label>
+          <label><input type="radio" name="extendDuration" value="24" /> 2 years</label>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" onclick="handleUpdateMembership()">Update Membership</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADD BOOK (MAINTENANCE) -->
+  <section id="addBookSection" class="section">
+    <div class="card">
+      <h2>Add Book / Movie</h2>
+      <div id="addBookMsg" class="error"></div>
+      <div id="addBookSuccess" class="success"></div>
+
+      <div class="radio-group">
+        <span>Type (mandatory):</span>
+        <label><input type="radio" name="addItemType" value="Book" checked /> Book</label>
+        <label><input type="radio" name="addItemType" value="Movie" /> Movie</label>
+      </div>
+
+      <label for="addBookTitle">Title (mandatory)</label>
+      <input type="text" id="addBookTitle" />
+
+      <label for="addBookAuthor">Author / Director (mandatory)</label>
+      <input type="text" id="addBookAuthor" />
+
+      <label for="addBookCategory">Category (mandatory)</label>
+      <input type="text" id="addBookCategory" />
+
+      <label for="addBookSerial">Serial No (mandatory)</label>
+      <input type="text" id="addBookSerial" />
+
+      <div class="form-actions">
+        <button type="button" onclick="handleAddBook()">Add</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- UPDATE BOOK (MAINTENANCE) -->
+  <section id="updateBookSection" class="section">
+    <div class="card">
+      <h2>Update Book / Movie</h2>
+      <div id="updateBookMsg" class="error"></div>
+      <div id="updateBookSuccess" class="success"></div>
+
+      <label for="updateBookSerialSearch">Serial No (mandatory to load)</label>
+      <input type="text" id="updateBookSerialSearch" />
+
+      <div class="form-actions">
+        <button type="button" onclick="populateBook()">Load Item</button>
+      </div>
+
+      <div id="updateBookForm" class="hidden">
+        <div class="radio-group">
+          <span>Type:</span>
+          <label><input type="radio" name="updateItemType" value="Book" checked /> Book</label>
+          <label><input type="radio" name="updateItemType" value="Movie" /> Movie</label>
+        </div>
+
+        <label for="updateBookTitle">Title (mandatory)</label>
+        <input type="text" id="updateBookTitle" />
+
+        <label for="updateBookAuthor">Author / Director (mandatory)</label>
+        <input type="text" id="updateBookAuthor" />
+
+        <label for="updateBookCategory">Category (mandatory)</label>
+        <input type="text" id="updateBookCategory" />
+
+        <div class="form-actions">
+          <button type="button" onclick="handleUpdateBook()">Update</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- USER MANAGEMENT (MAINTENANCE) -->
+  <section id="userManagementSection" class="section">
+    <div class="card">
+      <h2>User Management</h2>
+      <div id="userMgmtMsg" class="error"></div>
+      <div id="userMgmtSuccess" class="success"></div>
+
+      <div class="radio-group">
+        <span>Choose:</span>
+        <label><input type="radio" name="userMode" value="new" checked /> New User</label>
+        <label><input type="radio" name="userMode" value="existing" /> Existing User</label>
+      </div>
+
+      <label for="userName">Name (mandatory)</label>
+      <input type="text" id="userName" />
+
+      <label for="userLoginId">Login ID</label>
+      <input type="text" id="userLoginId" />
+
+      <label for="userRoleSelect">Role</label>
+      <select id="userRoleSelect">
+        <option value="user">User</option>
+        <option value="admin">Admin</option>
+      </select>
+
+      <div class="form-actions">
+        <button type="button" onclick="handleUserManagement()">Save</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+  // ------------------ SIMPLE IN-MEMORY DATA -------------------
+  let currentRole = null;
+  let lastIssuedRecord = null;     // for Return Book
+  let lastReturnRecord = null;     // for Fine Pay
+
+  const books = [
+    { title: "The Great Gatsby", author: "F. Scott Fitzgerald", category: "Fiction", serial: "B001" },
+    { title: "A Brief History of Time", author: "Stephen Hawking", category: "Science", serial: "B002" },
+    { title: "Inception", author: "Christopher Nolan", category: "Movie", serial: "M001" }
+  ];
+
+  const memberships = [
+    { number: "M1001", name: "John Doe", email: "john@example.com", phone: "1111111111", durationMonths: 6 }
+  ];
+
+  const users = [
+    { name: "Admin", loginId: "admin", role: "admin" },
+    { name: "User One", loginId: "user1", role: "user" }
+  ];
+
+  // ------------------ UTILS -------------------
+  function showSection(sectionId) {
+    document.querySelectorAll(".section").forEach(sec => sec.classList.remove("active"));
+    const target = document.getElementById(sectionId);
+    if (target) target.classList.add("active");
+
+    document.querySelectorAll("nav button[data-section]").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.section === sectionId);
+    });
+  }
+
+  function todayStr() {
+    const d = new Date();
+    return d.toISOString().substring(0, 10);
+  }
+
+  function addDaysStr(baseDateStr, days) {
+    const d = new Date(baseDateStr);
+    d.setDate(d.getDate() + days);
+    return d.toISOString().substring(0, 10);
+  }
+
+  // ------------------ LOGIN / LOGOUT -------------------
+  function handleLogin() {
+    const username = document.getElementById("loginUsername").value.trim();
+    const password = document.getElementById("loginPassword").value.trim();
+    const loginMsg = document.getElementById("loginMessage");
+    loginMsg.textContent = "";
+
+    if (!username || !password) {
+      loginMsg.textContent = "Please enter both username and password.";
+      return;
+    }
+
+    const role = document.querySelector("input[name='role']:checked").value;
+    currentRole = role;
+
+    document.getElementById("userInfo").textContent =
+      "Logged in as " + username + " (" + role.toUpperCase() + ")";
+
+    document.getElementById("navBar").classList.remove("hidden");
+
+    // Role-based navigation
+    // Admin: can access everything
+    // User: cannot access maintenance (Add/Update Book, Membership, User Mgmt)
+    const isAdmin = role === "admin";
+
+    const maintenanceButtons = [
+      "navAddBook",
+      "navUpdateBook",
+      "navAddMember",
+      "navUpdateMember",
+      "navUserMgmt"
+    ];
+    maintenanceButtons.forEach(id => {
+      const btn = document.getElementById(id);
+      if (isAdmin) {
+        btn.classList.remove("hidden");
+      } else {
+        btn.classList.add("hidden");
+      }
+    });
+
+    // Reports & transactions for everyone
+    ["navBookAvailable", "navBookIssue", "navReturnBook", "navFinePay"].forEach(id => {
+      document.getElementById(id).classList.remove("hidden");
+    });
+
+    // Show home
+    showSection("homeSection");
+    document.getElementById("loginSection").classList.remove("active");
+  }
+
+  document.getElementById("navLogout").addEventListener("click", () => {
+    currentRole = null;
+    document.getElementById("navBar").classList.add("hidden");
+    document.getElementById("userInfo").textContent = "Not logged in";
+    showSection("loginSection");
+  });
+
+  // Navigation button handlers
+  document.querySelectorAll("nav button[data-section]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const sectionId = btn.getAttribute("data-section");
+      showSection(sectionId);
+
+      // Some defaults per screen
+      if (sectionId === "bookIssueSection") {
+        const today = todayStr();
+        document.getElementById("issueDate").value = today;
+        document.getElementById("returnDateIssue").value = addDaysStr(today, 15);
+      }
+    });
+  });
+
+  // ------------------ BOOK AVAILABLE -------------------
+  function handleBookAvailableSearch() {
+    const msg = document.getElementById("bookAvailableMsg");
+    msg.textContent = "";
+    const searchText = document.getElementById("searchText").value.trim().toLowerCase();
+    const category = document.getElementById("categorySelect").value;
+
+    // At least one of textbox or dropdown required
+    if (!searchText && !category) {
+      msg.textContent = "Please enter a search text or select a category before searching.";
+      document.getElementById("searchResultsTable").classList.add("hidden");
+      return;
+    }
+
+    const tbody = document.getElementById("searchResultsBody");
+    tbody.innerHTML = "";
+
+    const filtered = books.filter(b => {
+      const matchText =
+        !searchText ||
+        b.title.toLowerCase().includes(searchText) ||
+        b.author.toLowerCase().includes(searchText);
+      const matchCat = !category || b.category === category;
+      return matchText && matchCat;
+    });
+
+    filtered.forEach((b, idx) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${b.title}</td>
+        <td>${b.author}</td>
+        <td>${b.category}</td>
+        <td>${b.serial}</td>
+        <td><input type="radio" name="searchSelect" value="${idx}" /></td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById("searchResultsTable").classList.remove("hidden");
+  }
+
+  // When a book is selected from search results, populate Book Issue fields
+  document.addEventListener("change", (e) => {
+    if (e.target.name === "searchSelect") {
+      const index = parseInt(e.target.value, 10);
+      const searchText = document.getElementById("searchText").value.trim().toLowerCase();
+      const category = document.getElementById("categorySelect").value;
+      const filtered = books.filter(b => {
+        const matchText =
+          !searchText ||
+          b.title.toLowerCase().includes(searchText) ||
+          b.author.toLowerCase().includes(searchText);
+        const matchCat = !category || b.category === category;
+        return matchText && matchCat;
+      });
+
+      const book = filtered[index];
+      if (book) {
+        document.getElementById("issueBookName").value = book.title;
+        document.getElementById("issueAuthorName").value = book.author;
+        showSection("bookIssueSection");
+        const today = todayStr();
+        document.getElementById("issueDate").value = today;
+        document.getElementById("returnDateIssue").value = addDaysStr(today, 15);
+      }
+    }
+  });
+
+  // ------------------ BOOK ISSUE -------------------
+  function handleBookIssue() {
+    const msg = document.getElementById("bookIssueMsg");
+    const success = document.getElementById("bookIssueSuccess");
+    msg.textContent = "";
+    success.textContent = "";
+
+    const name = document.getElementById("issueBookName").value.trim();
+    const author = document.getElementById("issueAuthorName").value.trim();
+    const issueDate = document.getElementById("issueDate").value;
+    const returnDate = document.getElementById("returnDateIssue").value;
+
+    if (!name) {
+      msg.textContent = "Name of book is required.";
+      return;
+    }
+    if (!author) {
+      msg.textContent = "Author name must be auto populated. Select a valid book.";
+      return;
+    }
+    if (!issueDate) {
+      msg.textContent = "Issue Date is required.";
+      return;
+    }
+
+    const today = todayStr();
+    if (issueDate < today) {
+      msg.textContent = "Issue Date cannot be earlier than today.";
+      return;
+    }
+    if (!returnDate) {
+      msg.textContent = "Return Date is required.";
+      return;
+    }
+    const maxReturn = addDaysStr(issueDate, 15);
+    if (returnDate > maxReturn) {
+      msg.textContent = "Return Date cannot be more than 15 days from Issue Date.";
+      return;
+    }
+
+    lastIssuedRecord = {
+      bookName: name,
+      author,
+      serial: (books.find(b => b.title === name && b.author === author) || {}).serial || "",
+      issueDate,
+      returnDate
+    };
+
+    success.textContent = "Book issued successfully.";
+  }
+
+  // ------------------ RETURN BOOK -------------------
+  function handleReturnBook() {
+    const msg = document.getElementById("returnBookMsg");
+    const success = document.getElementById("returnBookSuccess");
+    msg.textContent = "";
+    success.textContent = "";
+
+    const name = document.getElementById("returnBookName").value.trim();
+    const author = document.getElementById("returnAuthorName").value.trim();
+    const serial = document.getElementById("returnSerialNo").value.trim();
+    const issueDate = document.getElementById("returnIssueDate").value;
+    const returnDate = document.getElementById("returnDate").value;
+
+    if (!name || !serial || !issueDate || !returnDate || !author) {
+      msg.textContent = "Please fill all required Return Book details.";
+      return;
+    }
+
+    // store record for fine page
+    lastReturnRecord = {
+      bookName: name,
+      author,
+      serial,
+      issueDate,
+      returnDate
+    };
+
+    // compute simple fine: 2 Rs per late day beyond lastIssuedRecord.returnDate if available
+    let fine = 0;
+    if (lastIssuedRecord && lastIssuedRecord.returnDate) {
+      const due = new Date(lastIssuedRecord.returnDate);
+      const actual = new Date(returnDate);
+      const diffMs = actual - due;
+      const oneDay = 24 * 60 * 60 * 1000;
+      const diffDays = Math.floor(diffMs / oneDay);
+      if (diffDays > 0) {
+        fine = diffDays * 2;
+      }
+    }
+
+    // populate fine page
+    document.getElementById("fineBookName").value = name;
+    document.getElementById("fineMemberName").value = "Sample Member";
+    document.getElementById("fineAmount").value = fine;
+    document.getElementById("finePaidCheckbox").checked = false;
+    document.getElementById("fineRemarks").value = "";
+    document.getElementById("finePayMsg").textContent = "";
+    document.getElementById("finePaySuccess").textContent = "";
+
+    success.textContent = "Return details captured. Proceeding to Fine Pay page.";
+    showSection("finePaySection");
+  }
+
+  // ------------------ FINE PAY -------------------
+  function handleFinePay() {
+    const msg = document.getElementById("finePayMsg");
+    const success = document.getElementById("finePaySuccess");
+    msg.textContent = "";
+    success.textContent = "";
+
+    const fineAmount = parseFloat(document.getElementById("fineAmount").value || "0");
+    const paid = document.getElementById("finePaidCheckbox").checked;
+
+    if (fineAmount > 0 && !paid) {
+      msg.textContent = "Pending fine exists. Please tick 'Fine Paid' before confirming.";
+      return;
+    }
+
+    success.textContent = "Return Book transaction completed successfully.";
+  }
+
+  // ------------------ ADD MEMBERSHIP -------------------
+  function handleAddMembership() {
+    const msg = document.getElementById("addMemberMsg");
+    const success = document.getElementById("addMemberSuccess");
+    msg.textContent = "";
+    success.textContent = "";
+
+    const name = document.getElementById("addMemberName").value.trim();
+    const email = document.getElementById("addMemberEmail").value.trim();
+    const phone = document.getElementById("addMemberPhone").value.trim();
+    const durationRadio = document.querySelector("input[name='addMemberDuration']:checked");
+
+    if (!name || !email || !phone || !durationRadio) {
+      msg.textContent = "All fields are mandatory and a duration must be selected.";
+      return;
+    }
+
+    const durationMonths = parseInt(durationRadio.value, 10);
+    const newNumber = "M" + (1000 + memberships.length + 1);
+    memberships.push({ number: newNumber, name, email, phone, durationMonths });
+
+    success.textContent = "Membership added successfully with number: " + newNumber;
+  }
+
+  // ------------------ UPDATE MEMBERSHIP -------------------
+  function populateMembership() {
+    const msg = document.getElementById("updateMemberMsg");
+    const success = document.getElementById("updateMemberSuccess");
+    msg.textContent = "";
+    success.textContent = "";
+
+    const number = document.getElementById("updateMemberNumber").value.trim();
+    if (!number) {
+      msg.textContent = "Membership Number is mandatory.";
+      return;
+    }
+
+    const mem = memberships.find(m => m.number === number);
+    if (!mem) {
+      msg.textContent = "Membership not found.";
+      document.getElementById("updateMemberForm").classList.add("hidden");
+      return;
+    }
+
+    document.getElementById("updateMemberName").value = mem.name;
+    document.getElementById("updateMemberEmail").value = mem.email;
+    document.getElementById("updateMemberPhone").value = mem.phone;
+    document.getElementById("updateMemberForm").classList.remove("hidden");
+  }
+
+  function handleUpdateMembership() {
+    const msg = document.getElementById("updateMemberMsg");
+    const success = document.getElementById("updateMemberSuccess");
+    msg.textContent = "";
+    success.textContent = "";
+
+    const number = document.getElementById("updateMemberNumber").value.trim();
+    if (!number) {
+      msg.textContent = "Membership Number is mandatory.";
+      return;
+    }
+    const mem = memberships.find(m => m.number === number);
+    if (!mem) {
+      msg.textContent = "Membership not found.";
+      return;
+    }
+
+    const action = document.querySelector("input[name='memberAction']:checked").value;
+    if (action === "extend") {
+      const extendMonths = parseInt(
+        document.querySelector("input[name='extendDuration']:checked").value,
+        10
+      );
+      mem.durationMonths += extendMonths;
+      success.textContent = "Membership extended by " + extendMonths + " months.";
+    } else {
+      success.textContent = "Membership cancelled.";
+    }
+  }
+
+  // ------------------ ADD BOOK -------------------
+  function handleAddBook() {
+    const msg = document.getElementById("addBookMsg");
+    const success = document.getElementById("addBookSuccess");
+    msg.textContent = "";
+    success.textContent = "";
+
+    const type = document.querySelector("input[name='addItemType']:checked").value;
+    const title = document.getElementById("addBookTitle").value.trim();
+    const author = document.getElementById("addBookAuthor").value.trim();
+    const category = document.getElementById("addBookCategory").value.trim();
+    const serial = document.getElementById("addBookSerial").value.trim();
+
+    if (!title || !author || !category || !serial) {
+      msg.textContent = "All fields are mandatory for Add Book/Movie.";
+      return;
+    }
+
+    books.push({ title, author, category, serial, type });
+    success.textContent = type + " added successfully.";
+  }
+
+  // ------------------ UPDATE BOOK -------------------
+  function populateBook() {
+    const msg = document.getElementById("updateBookMsg");
+    const success = document.getElementById("updateBookSuccess");
+    msg.textContent = "";
+    success.textContent = "";
+
+    const serial = document.getElementById("updateBookSerialSearch").value.trim();
+    if (!serial) {
+      msg.textContent = "Serial No is mandatory to load the book.";
+      document.getElementById("updateBookForm").classList.add("hidden");
+      return;
+    }
+
+    const book = books.find(b => b.serial === serial);
+    if (!book) {
+      msg.textContent = "Book/Movie not found.";
+      document.getElementById("updateBookForm").classList.add("hidden");
+      return;
+    }
+
+    document.getElementById("updateBookTitle").value = book.title;
+    document.getElementById("updateBookAuthor").value = book.author;
+    document.getElementById("updateBookCategory").value = book.category;
+
+    if (book.type === "Movie") {
+      document.querySelector("input[name='updateItemType'][value='Movie']").checked = true;
+    } else {
+      document.querySelector("input[name='updateItemType'][value='Book']").checked = true;
+    }
+
+    document.getElementById("updateBookForm").classList.remove("hidden");
+  }
+
+  function handleUpdateBook() {
+    const msg = document.getElementById("updateBookMsg");
+    const success = document.getElementById("updateBookSuccess");
+    msg.textContent = "";
+    success.textContent = "";
+
+    const serial = document.getElementById("updateBookSerialSearch").value.trim();
+    const book = books.find(b => b.serial === serial);
+    if (!book) {
+      msg.textContent = "Book/Movie not found.";
+      return;
+    }
+
+    const type = document.querySelector("input[name='updateItemType']:checked").value;
+    const title = document.getElementById("updateBookTitle").value.trim();
+    const author = document.getElementById("updateBookAuthor").value.trim();
+    const category = document.getElementById("updateBookCategory").value.trim();
+
+    if (!title || !author || !category) {
+      msg.textContent = "All fields are mandatory for Update Book/Movie.";
+      return;
+    }
+
+    book.title = title;
+    book.author = author;
+    book.category = category;
+    book.type = type;
+
+    success.textContent = "Book/Movie updated successfully.";
+  }
+
+  // ------------------ USER MANAGEMENT -------------------
+  function handleUserManagement() {
+    const msg = document.getElementById("userMgmtMsg");
+    const success = document.getElementById("userMgmtSuccess");
+    msg.textContent = "";
+    success.textContent = "";
+
+    const mode = document.querySelector("input[name='userMode']:checked").value;
+    const name = document.getElementById("userName").value.trim();
+    const loginId = document.getElementById("userLoginId").value.trim();
+    const role = document.getElementById("userRoleSelect").value;
+
+    if (!name) {
+      msg.textContent = "Name is mandatory.";
+      return;
+    }
+
+    if (mode === "new") {
+      if (!loginId) {
+        msg.textContent = "Login ID is required for new user.";
+        return;
+      }
+      users.push({ name, loginId, role });
+      success.textContent = "New user created successfully.";
+    } else {
+      if (!loginId) {
+        msg.textContent = "Login ID is required to update existing user.";
+        return;
+      }
+      const user = users.find(u => u.loginId === loginId);
+      if (!user) {
+        msg.textContent = "User not found.";
+        return;
+      }
+      user.name = name;
+      user.role = role;
+      success.textContent = "Existing user updated successfully.";
+    }
+  }
+
+  // ------------------ INIT DEFAULTS -------------------
+  // Default dates in forms where applicable
+  window.addEventListener("load", () => {
+    const today = todayStr();
+    document.getElementById("issueDate").value = today;
+    document.getElementById("returnDateIssue").value = addDaysStr(today, 15);
+
+    // For Return Book defaults from lastIssuedRecord if any
+    if (lastIssuedRecord) {
+      document.getElementById("returnBookName").value = lastIssuedRecord.bookName;
+      document.getElementById("returnAuthorName").value = lastIssuedRecord.author;
+      document.getElementById("returnSerialNo").value = lastIssuedRecord.serial;
+      document.getElementById("returnIssueDate").value = lastIssuedRecord.issueDate;
+      document.getElementById("returnDate").value = lastIssuedRecord.returnDate;
+    }
+  });
+</script>
+</body>
+</html>
